@@ -12,7 +12,7 @@ import {
 import { SubcategoryService } from './subcategory.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { ResponseMessage } from '../../common/decorators/responseMessage.decorator';
-import { getSubcategoriesDto } from './dto/getSubcategories.dto';
+import { GetSubcategoriesDto } from './dto/getSubcategories.dto';
 import { Role } from '../../common/decorators/role.decorator';
 import { CreateSubcategoryDto } from './dto/createSubcategory.dto';
 import { UpdateSubcategoryDto } from './dto/updateSubcategory.dto';
@@ -27,7 +27,7 @@ export class SubcategoryController {
   @Get()
   @Public()
   @ResponseMessage('Get subcategories successfully')
-  async findAll(@Query() query: getSubcategoriesDto) {
+  async findAll(@Query() query: GetSubcategoriesDto) {
     return this.subcategoryService.findAll(query);
   }
 

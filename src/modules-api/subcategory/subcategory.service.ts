@@ -4,11 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
-import { getSubcategoriesDto } from './dto/getSubcategories.dto';
-import {
-  buildMeta,
-  buildPagination,
-} from '../../common/helpers/pagination.helper';
+import { GetSubcategoriesDto } from './dto/getSubcategories.dto';
+import { paginate } from '../../common/helpers/pagination.helper';
 import { CreateSubcategoryDto } from './dto/createSubcategory.dto';
 import { UpdateSubcategoryDto } from './dto/updateSubcategory.dto';
 
@@ -16,28 +13,28 @@ import { UpdateSubcategoryDto } from './dto/updateSubcategory.dto';
 export class SubcategoryService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(query: getSubcategoriesDto) {
-    const { page, pageSize, keyword } = query;
+  async findAll(query: GetSubcategoriesDto) {
     const where = {
       is_deleted: false,
-      ...(keyword && { name: { contains: keyword } }),
+      name: query.keyword ? { contains: query.keyword } : undefined,
     };
-    const { skip, take } = buildPagination(page, pageSize);
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.subcategories.findMany({
-        where,
-        orderBy: { id: 'asc' },
-        skip,
-        take,
-        select: {
-          id: true,
-          name: true,
-        },
-      }),
-      this.prisma.subcategories.count({ where }),
-    ]);
 
-    return { items, meta: buildMeta(total, page, pageSize) };
+    const subcategoryList = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.subcategories.findMany({
+          where,
+          orderBy: { id: 'asc' },
+          select: {
+            id: true,
+            name: true,
+          },
+          ...pagination,
+        }),
+      () => this.prisma.subcategories.count({ where }),
+    );
+
+    return subcategoryList;
   }
 
   async findOne(id: number) {

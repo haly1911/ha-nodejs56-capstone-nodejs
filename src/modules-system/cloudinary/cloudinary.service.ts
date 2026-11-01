@@ -12,7 +12,10 @@ export class CloudinaryService {
       const stream = cloudinary.uploader.upload_stream(
         { folder },
         (error, result) => {
-          result ? resolve(result) : reject(error);
+          if (error || !result) {
+            return reject(new Error(error?.message ?? 'Upload failed'));
+          }
+          resolve(result);
         },
       );
       stream.end(fileBuffer);

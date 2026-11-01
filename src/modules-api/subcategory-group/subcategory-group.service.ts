@@ -4,11 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
-import { getSubcategoryGroupsDto } from './dto/getSubcategoryGroups.dto';
-import {
-  buildMeta,
-  buildPagination,
-} from '../../common/helpers/pagination.helper';
+import { GetSubcategoryGroupsDto } from './dto/getSubcategoryGroups.dto';
+import { paginate } from '../../common/helpers/pagination.helper';
 import { CreateSubcategoryGroupDto } from './dto/createSubcategoryGroup.dto';
 import { UpdateSubcategoryGroupDto } from './dto/updateSubcategoryGroup.dto';
 
@@ -16,32 +13,32 @@ import { UpdateSubcategoryGroupDto } from './dto/updateSubcategoryGroup.dto';
 export class SubcategoryGroupService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(query: getSubcategoryGroupsDto) {
-    const { page, pageSize, keyword } = query;
+  async findAll(query: GetSubcategoryGroupsDto) {
     const where = {
       is_deleted: false,
-      ...(keyword && { name: { contains: keyword } }),
+      name: query.keyword ? { contains: query.keyword } : undefined,
     };
-    const { skip, take } = buildPagination(page, pageSize);
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.subcategory_groups.findMany({
-        where,
-        orderBy: { id: 'asc' },
-        skip,
-        take,
-        select: {
-          id: true,
-          name: true,
-          subcategories: {
-            where: { is_deleted: false },
-            select: { id: true, name: true },
-          },
-        },
-      }),
-      this.prisma.subcategory_groups.count({ where }),
-    ]);
 
-    return { items, meta: buildMeta(total, page, pageSize) };
+    const subcategoryGroupList = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.subcategory_groups.findMany({
+          where,
+          orderBy: { id: 'asc' },
+          select: {
+            id: true,
+            name: true,
+            subcategories: {
+              where: { is_deleted: false },
+              select: { id: true, name: true },
+            },
+          },
+          ...pagination,
+        }),
+      () => this.prisma.subcategory_groups.count({ where }),
+    );
+
+    return subcategoryGroupList;
   }
 
   async findOne(id: number) {

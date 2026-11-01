@@ -1,10 +1,10 @@
-import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { Trim } from '../../../common/decorators/trim.decorator';
 
 export class CreateCategoryDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Trim()
   name: string;
 }

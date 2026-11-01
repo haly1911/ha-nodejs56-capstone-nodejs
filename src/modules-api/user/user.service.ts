@@ -8,10 +8,7 @@ import {
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { GetUsersDto } from './dto/getUsers.dto';
 import { Prisma } from '../../modules-system/prisma/generated/prisma/client';
-import {
-  buildMeta,
-  buildPagination,
-} from '../../common/helpers/pagination.helper';
+import { paginate } from '../../common/helpers/pagination.helper';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import * as bcrypt from 'bcrypt';
@@ -124,30 +121,31 @@ export class UserService {
   }
 
   async findAll(query: GetUsersDto) {
-    const { page, pageSize, keyword } = query;
     const where: Prisma.usersWhereInput = {
       is_deleted: false,
       role: query.role,
       account_status: query.accountStatus,
-      OR: keyword
-        ? [{ name: { contains: keyword } }, { email: { contains: keyword } }]
+      OR: query.keyword
+        ? [
+            { name: { contains: query.keyword } },
+            { email: { contains: query.keyword } },
+          ]
         : undefined,
     };
 
-    const { skip, take } = buildPagination(page, pageSize);
+    const userList = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.users.findMany({
+          where,
+          orderBy: { id: 'asc' },
+          select: USER_SELECT,
+          ...pagination,
+        }),
+      () => this.prisma.users.count({ where }),
+    );
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.users.findMany({
-        where,
-        skip,
-        take,
-        orderBy: { id: 'asc' },
-        select: USER_SELECT,
-      }),
-      this.prisma.users.count({ where }),
-    ]);
-
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return userList;
   }
 
   async findOne(id: number) {

@@ -1,11 +1,12 @@
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString, MaxLength, Min } from 'class-validator';
+import { Trim } from '../../../common/decorators/trim.decorator';
 
 export class CreateSubcategoryGroupDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Trim()
   name: string;
 
   @Type(() => Number)

@@ -7,14 +7,26 @@ import {
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { GetGigsDto } from './dto/getGigs.dto';
 import { Prisma } from '../../modules-system/prisma/generated/prisma/client';
-import {
-  buildMeta,
-  buildPagination,
-} from '../../common/helpers/pagination.helper';
+import { paginate } from '../../common/helpers/pagination.helper';
 import { CreateGigDto } from './dto/createGig.dto';
 import { UpdateGigDto } from './dto/updateGig.dto';
 import { UpdateModerationDto } from '../../common/dto/updateModeration.dto';
 import { CloudinaryService } from '../../modules-system/cloudinary/cloudinary.service';
+
+const GIG_LIST_SELECT = {
+  id: true,
+  title: true,
+  price: true,
+  rating: true,
+  review: true,
+  image: true,
+  short_description: true,
+} satisfies Prisma.gigsSelect;
+
+const withSeller = <T extends { users_gigs_seller_idTousers: unknown }>({
+  users_gigs_seller_idTousers: seller,
+  ...gig
+}: T) => ({ ...gig, seller });
 
 @Injectable()
 export class GigService {
@@ -23,113 +35,67 @@ export class GigService {
     private cloudinary: CloudinaryService,
   ) {}
 
-  async findAll(query: GetGigsDto) {
-    const {
-      page,
-      pageSize,
-      keyword,
-      categoryId,
-      subcategoryId,
-      minPrice,
-      maxPrice,
-      sortBy,
-      order,
-    } = query;
-    const where: Prisma.gigsWhereInput = {
+  private buildGigFilter(query: GetGigsDto): Prisma.gigsWhereInput {
+    return {
       is_deleted: false,
-      moderation_status: 'Active',
-      title: keyword ? { contains: keyword } : undefined,
-      subcategory_id: subcategoryId,
-      price: { gte: minPrice, lte: maxPrice },
-      subcategories: categoryId
-        ? { subcategory_groups: { category_id: categoryId } }
+      title: query.keyword ? { contains: query.keyword } : undefined,
+      subcategory_id: query.subcategoryId,
+      price: { gte: query.minPrice, lte: query.maxPrice },
+      subcategories: query.categoryId
+        ? { subcategory_groups: { category_id: query.categoryId } }
         : undefined,
+    };
+  }
+
+  async findAll(query: GetGigsDto) {
+    const where: Prisma.gigsWhereInput = {
+      ...this.buildGigFilter(query),
+      moderation_status: 'Active',
       users_gigs_seller_idTousers: {
         is_deleted: false,
         account_status: 'Active',
       },
     };
 
-    const { skip, take } = buildPagination(page, pageSize);
-
-    const [rows, total] = await this.prisma.$transaction([
-      this.prisma.gigs.findMany({
-        where,
-        skip,
-        take,
-        orderBy: [{ [sortBy]: order }, { id: 'asc' }],
-        select: {
-          id: true,
-          title: true,
-          price: true,
-          rating: true,
-          review: true,
-          image: true,
-          short_description: true,
-          users_gigs_seller_idTousers: {
-            select: { id: true, name: true, avatar: true },
+    const gigList = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.gigs.findMany({
+          where,
+          orderBy: [{ [query.sortBy]: query.order }, { id: 'asc' }],
+          select: {
+            ...GIG_LIST_SELECT,
+            users_gigs_seller_idTousers: {
+              select: { id: true, name: true, avatar: true },
+            },
           },
-        },
-      }),
-      this.prisma.gigs.count({ where }),
-    ]);
-
-    const items = rows.map(
-      ({ users_gigs_seller_idTousers: seller, ...gig }) => ({
-        ...gig,
-        seller,
-      }),
+          ...pagination,
+        }),
+      () => this.prisma.gigs.count({ where }),
     );
 
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return { ...gigList, items: gigList.items.map(withSeller) };
   }
 
   async findMyGigs(query: GetGigsDto, userId: number) {
-    const {
-      page,
-      pageSize,
-      keyword,
-      categoryId,
-      subcategoryId,
-      minPrice,
-      maxPrice,
-      sortBy,
-      order,
-    } = query;
     const where: Prisma.gigsWhereInput = {
+      ...this.buildGigFilter(query),
       seller_id: userId,
-      is_deleted: false,
-      title: keyword ? { contains: keyword } : undefined,
-      subcategory_id: subcategoryId,
-      price: { gte: minPrice, lte: maxPrice },
-      subcategories: categoryId
-        ? { subcategory_groups: { category_id: categoryId } }
-        : undefined,
     };
 
-    const { skip, take } = buildPagination(page, pageSize);
+    const myGigs = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.gigs.findMany({
+          where,
+          orderBy: [{ [query.sortBy]: query.order }, { id: 'asc' }],
+          select: { ...GIG_LIST_SELECT, moderation_status: true },
+          ...pagination,
+        }),
+      () => this.prisma.gigs.count({ where }),
+    );
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.gigs.findMany({
-        where,
-        skip,
-        take,
-        orderBy: [{ [sortBy]: order }, { id: 'asc' }],
-        select: {
-          id: true,
-          title: true,
-          price: true,
-          rating: true,
-          review: true,
-          image: true,
-          short_description: true,
-          moderation_status: true,
-        },
-      }),
-      this.prisma.gigs.count({ where }),
-    ]);
-
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return myGigs;
   }
 
   async findOne(id: number) {
@@ -144,14 +110,8 @@ export class GigService {
         },
       },
       select: {
-        id: true,
-        title: true,
-        price: true,
-        rating: true,
-        review: true,
-        image: true,
+        ...GIG_LIST_SELECT,
         description: true,
-        short_description: true,
         users_gigs_seller_idTousers: {
           select: { id: true, name: true, avatar: true },
         },
@@ -159,8 +119,7 @@ export class GigService {
     });
     if (!gig) throw new NotFoundException('Gig not found');
 
-    const { users_gigs_seller_idTousers: seller, ...rest } = gig;
-    return { ...rest, seller };
+    return withSeller(gig);
   }
 
   async createGig(dto: CreateGigDto, userId: number) {

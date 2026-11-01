@@ -12,7 +12,7 @@ import {
 import { SubcategoryGroupService } from './subcategory-group.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { ResponseMessage } from '../../common/decorators/responseMessage.decorator';
-import { getSubcategoryGroupsDto } from './dto/getSubcategoryGroups.dto';
+import { GetSubcategoryGroupsDto } from './dto/getSubcategoryGroups.dto';
 import { Role } from '../../common/decorators/role.decorator';
 import { CreateSubcategoryGroupDto } from './dto/createSubcategoryGroup.dto';
 import { UpdateSubcategoryGroupDto } from './dto/updateSubcategoryGroup.dto';
@@ -27,7 +27,7 @@ export class SubcategoryGroupController {
   @Get()
   @Public()
   @ResponseMessage('Get subcategory groups successfully')
-  async findAll(@Query() query: getSubcategoryGroupsDto) {
+  async findAll(@Query() query: GetSubcategoryGroupsDto) {
     return this.subcategoryGroupService.findAll(query);
   }
 

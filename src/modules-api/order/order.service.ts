@@ -8,10 +8,7 @@ import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { CreateOrderDto } from './dto/createOrder.dto';
 import { Prisma } from '../../modules-system/prisma/generated/prisma/client';
 import { GetOrdersDto } from './dto/getOrders.dto';
-import {
-  buildMeta,
-  buildPagination,
-} from '../../common/helpers/pagination.helper';
+import { paginate } from '../../common/helpers/pagination.helper';
 import { UpdateOrderStatusDto } from './dto/updateOrderStatus.dto';
 
 type OrderRole = 'buyer' | 'seller';
@@ -40,6 +37,17 @@ const ORDER_SELECT = {
     select: { id: true, name: true, avatar: true },
   },
 } satisfies Prisma.ordersSelect;
+
+type OrderRow = Prisma.ordersGetPayload<{ select: typeof ORDER_SELECT }>;
+
+const mapOrder = ({
+  users_orders_buyer_idTousers: buyer,
+  gigs,
+  ...order
+}: OrderRow) => {
+  const { users_gigs_seller_idTousers: seller, ...gig } = gigs;
+  return { ...order, buyer, gig: { ...gig, seller } };
+};
 
 @Injectable()
 export class OrderService {
@@ -79,78 +87,72 @@ export class OrderService {
       select: ORDER_SELECT,
     });
 
-    return newOrder;
+    return mapOrder(newOrder);
   }
 
   async findMyOrders(query: GetOrdersDto, userId: number) {
-    const { page, pageSize } = query;
     const where: Prisma.ordersWhereInput = {
       is_deleted: false,
       buyer_id: userId,
       status: query.status,
     };
 
-    const { skip, take } = buildPagination(page, pageSize);
+    const myOrders = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.orders.findMany({
+          where,
+          orderBy: [{ ordered_at: 'desc' }, { id: 'desc' }],
+          select: ORDER_SELECT,
+          ...pagination,
+        }),
+      () => this.prisma.orders.count({ where }),
+    );
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.orders.findMany({
-        where,
-        skip,
-        take,
-        orderBy: [{ ordered_at: 'desc' }, { id: 'desc' }],
-        select: ORDER_SELECT,
-      }),
-      this.prisma.orders.count({ where }),
-    ]);
-
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return { ...myOrders, items: myOrders.items.map(mapOrder) };
   }
 
   async findMySales(query: GetOrdersDto, userId: number) {
-    const { page, pageSize } = query;
     const where: Prisma.ordersWhereInput = {
       is_deleted: false,
       gigs: { seller_id: userId },
       status: query.status,
     };
 
-    const { skip, take } = buildPagination(page, pageSize);
+    const mySales = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.orders.findMany({
+          where,
+          orderBy: [{ ordered_at: 'desc' }, { id: 'desc' }],
+          select: ORDER_SELECT,
+          ...pagination,
+        }),
+      () => this.prisma.orders.count({ where }),
+    );
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.orders.findMany({
-        where,
-        skip,
-        take,
-        orderBy: [{ ordered_at: 'desc' }, { id: 'desc' }],
-        select: ORDER_SELECT,
-      }),
-      this.prisma.orders.count({ where }),
-    ]);
-
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return { ...mySales, items: mySales.items.map(mapOrder) };
   }
 
   async findAll(query: GetOrdersDto) {
-    const { page, pageSize } = query;
     const where = {
       is_deleted: false,
       status: query.status,
     };
 
-    const { skip, take } = buildPagination(page, pageSize);
+    const orderList = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.orders.findMany({
+          where,
+          orderBy: [{ ordered_at: 'desc' }, { id: 'desc' }],
+          select: ORDER_SELECT,
+          ...pagination,
+        }),
+      () => this.prisma.orders.count({ where }),
+    );
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.orders.findMany({
-        where,
-        skip,
-        take,
-        orderBy: [{ ordered_at: 'desc' }, { id: 'desc' }],
-        select: ORDER_SELECT,
-      }),
-      this.prisma.orders.count({ where }),
-    ]);
-
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return { ...orderList, items: orderList.items.map(mapOrder) };
   }
 
   async findOne(id: number, user: { id: number; role: string }) {
@@ -167,7 +169,7 @@ export class OrderService {
       throw new NotFoundException('Order not found');
     }
 
-    return order;
+    return mapOrder(order);
   }
 
   async updateOrderStatus(

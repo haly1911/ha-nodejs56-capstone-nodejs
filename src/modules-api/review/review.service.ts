@@ -9,10 +9,7 @@ import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { CreateReviewDto } from './dto/createReview.dto';
 import { UpdateReviewDto } from './dto/updateReview.dto';
 import { GetReviewsDto } from './dto/getReviews.dto';
-import {
-  buildMeta,
-  buildPagination,
-} from '../../common/helpers/pagination.helper';
+import { paginate } from '../../common/helpers/pagination.helper';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { UpdateModerationDto } from '../../common/dto/updateModeration.dto';
 
@@ -26,6 +23,11 @@ const REVIEW_SELECT = {
     select: { id: true, name: true, avatar: true },
   },
 } satisfies Prisma.reviewsSelect;
+
+const withAuthor = <T extends { users_reviews_user_idTousers: unknown }>({
+  users_reviews_user_idTousers: author,
+  ...review
+}: T) => ({ ...review, author });
 
 @Injectable()
 export class ReviewService {
@@ -47,7 +49,6 @@ export class ReviewService {
   }
 
   async findReviewsByGig(query: GetReviewsDto) {
-    const { page, pageSize } = query;
     const where: Prisma.reviewsWhereInput = {
       gig_id: query.gig_id,
       is_deleted: false,
@@ -58,47 +59,44 @@ export class ReviewService {
       },
     };
 
-    const { skip, take } = buildPagination(page, pageSize);
+    const gigReviews = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.reviews.findMany({
+          where,
+          orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
+          select: REVIEW_SELECT,
+          ...pagination,
+        }),
+      () => this.prisma.reviews.count({ where }),
+    );
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.reviews.findMany({
-        where,
-        skip,
-        take,
-        orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
-        select: REVIEW_SELECT,
-      }),
-      this.prisma.reviews.count({ where }),
-    ]);
-
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return { ...gigReviews, items: gigReviews.items.map(withAuthor) };
   }
 
   async findMyReviews(query: PaginationDto, userId: number) {
-    const { page, pageSize } = query;
     const where: Prisma.reviewsWhereInput = {
       user_id: userId,
       is_deleted: false,
     };
 
-    const { skip, take } = buildPagination(page, pageSize);
+    const myReviews = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.reviews.findMany({
+          where,
+          orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
+          select: {
+            ...REVIEW_SELECT,
+            moderation_status: true,
+            gigs: { select: { id: true, title: true } },
+          },
+          ...pagination,
+        }),
+      () => this.prisma.reviews.count({ where }),
+    );
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.reviews.findMany({
-        where,
-        skip,
-        take,
-        orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
-        select: {
-          ...REVIEW_SELECT,
-          moderation_status: true,
-          gigs: { select: { id: true, title: true } },
-        },
-      }),
-      this.prisma.reviews.count({ where }),
-    ]);
-
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return { ...myReviews, items: myReviews.items.map(withAuthor) };
   }
 
   async createReview(dto: CreateReviewDto, userId: number) {

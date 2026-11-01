@@ -1,7 +1,7 @@
 import { IsOptional, IsString, MaxLength } from 'class-validator';
 import { PaginationDto } from '../../../common/dto/pagination.dto';
 
-export class getSubcategoriesDto extends PaginationDto {
+export class GetSubcategoriesDto extends PaginationDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)

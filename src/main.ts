@@ -27,4 +27,4 @@ async function bootstrap() {
     console.log(`Gateway is running on port ${PORT}`);
   });
 }
-bootstrap();
+void bootstrap();

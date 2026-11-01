@@ -7,68 +7,53 @@ import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { CreateCategoryDto } from './dto/createCategory.dto';
 import { UpdateCategoryDto } from './dto/updateCategory.dto';
 import { GetCategoriesDto } from './dto/getCategories.dto';
-import {
-  buildMeta,
-  buildPagination,
-} from '../../common/helpers/pagination.helper';
+import { paginate } from '../../common/helpers/pagination.helper';
+import { Prisma } from '../../modules-system/prisma/generated/prisma/client';
+
+const CATEGORY_TREE_SELECT = {
+  id: true,
+  name: true,
+  subcategory_groups: {
+    where: { is_deleted: false },
+    select: {
+      id: true,
+      name: true,
+      subcategories: {
+        where: { is_deleted: false },
+        select: { id: true, name: true },
+      },
+    },
+  },
+} satisfies Prisma.categoriesSelect;
 
 @Injectable()
 export class CategoryService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: GetCategoriesDto) {
-    const { page, pageSize, keyword } = query;
     const where = {
       is_deleted: false,
-      ...(keyword && { name: { contains: keyword } }),
+      name: query.keyword ? { contains: query.keyword } : undefined,
     };
-    const { skip, take } = buildPagination(page, pageSize);
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.categories.findMany({
-        where,
-        orderBy: { id: 'asc' },
-        skip,
-        take,
-        select: {
-          id: true,
-          name: true,
-          subcategory_groups: {
-            where: { is_deleted: false },
-            select: {
-              id: true,
-              name: true,
-              subcategories: {
-                where: { is_deleted: false },
-                select: { id: true, name: true },
-              },
-            },
-          },
-        },
-      }),
-      this.prisma.categories.count({ where }),
-    ]);
+    const categoryList = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.categories.findMany({
+          where,
+          orderBy: { id: 'asc' },
+          select: CATEGORY_TREE_SELECT,
+          ...pagination,
+        }),
+      () => this.prisma.categories.count({ where }),
+    );
 
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return categoryList;
   }
 
   async findOne(id: number) {
     const category = await this.prisma.categories.findFirst({
       where: { id, is_deleted: false },
-      select: {
-        id: true,
-        name: true,
-        subcategory_groups: {
-          where: { is_deleted: false },
-          select: {
-            id: true,
-            name: true,
-            subcategories: {
-              where: { is_deleted: false },
-              select: { id: true, name: true },
-            },
-          },
-        },
-      },
+      select: CATEGORY_TREE_SELECT,
     });
     if (!category) throw new NotFoundException('Category not found');
 

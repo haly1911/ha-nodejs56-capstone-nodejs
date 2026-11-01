@@ -9,10 +9,7 @@ import { Prisma } from '../../modules-system/prisma/generated/prisma/client';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { CreateReportDto } from './dto/createReport.dto';
 import { GetReportsDto } from './dto/getReports.dto';
-import {
-  buildMeta,
-  buildPagination,
-} from '../../common/helpers/pagination.helper';
+import { paginate } from '../../common/helpers/pagination.helper';
 import { HandleReportDto } from './dto/handleReport.dto';
 import { ReviewService } from '../review/review.service';
 
@@ -42,6 +39,16 @@ const REPORT_SELECT = {
   },
   users_reports_reporter_idTousers: { select: { id: true, name: true } },
 } satisfies Prisma.reportsSelect;
+
+type ReportRow = Prisma.reportsGetPayload<{ select: typeof REPORT_SELECT }>;
+
+const mapReport = ({
+  users_reports_reporter_idTousers: reporter,
+  users_reports_reported_user_idTousers: reportedUser,
+  gigs: gig,
+  reviews: review,
+  ...report
+}: ReportRow) => ({ ...report, reporter, reportedUser, gig, review });
 
 @Injectable()
 export class ReportService {
@@ -94,34 +101,31 @@ export class ReportService {
       select: REPORT_SELECT,
     });
 
-    return newReport;
+    return mapReport(newReport);
   }
 
   async findMyReports(query: GetReportsDto, userId: number) {
-    const { page, pageSize } = query;
     const where: Prisma.reportsWhereInput = {
       reporter_id: userId,
       status: query.status,
     };
 
-    const { skip, take } = buildPagination(page, pageSize);
+    const myReports = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.reports.findMany({
+          where,
+          orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
+          select: REPORT_SELECT,
+          ...pagination,
+        }),
+      () => this.prisma.reports.count({ where }),
+    );
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.reports.findMany({
-        where,
-        skip,
-        take,
-        orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
-        select: REPORT_SELECT,
-      }),
-      this.prisma.reports.count({ where }),
-    ]);
-
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return { ...myReports, items: myReports.items.map(mapReport) };
   }
 
   async findAll(query: GetReportsDto) {
-    const { page, pageSize } = query;
     const where: Prisma.reportsWhereInput = {
       status: query.status,
       reason: query.reason,
@@ -131,20 +135,19 @@ export class ReportService {
         query.target_type === 'user' ? { not: null } : undefined,
     };
 
-    const { skip, take } = buildPagination(page, pageSize);
+    const reportList = await paginate(
+      query,
+      (pagination) =>
+        this.prisma.reports.findMany({
+          where,
+          orderBy: [{ created_at: 'asc' }, { id: 'asc' }],
+          select: REPORT_SELECT,
+          ...pagination,
+        }),
+      () => this.prisma.reports.count({ where }),
+    );
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.reports.findMany({
-        where,
-        skip,
-        take,
-        orderBy: [{ created_at: 'asc' }, { id: 'asc' }],
-        select: REPORT_SELECT,
-      }),
-      this.prisma.reports.count({ where }),
-    ]);
-
-    return { items, meta: buildMeta(total, page, pageSize) };
+    return { ...reportList, items: reportList.items.map(mapReport) };
   }
 
   async findOne(id: number, user: { id: number; role: string }) {
@@ -160,7 +163,7 @@ export class ReportService {
       throw new NotFoundException('Report not found');
     }
 
-    return report;
+    return mapReport(report);
   }
 
   async handleReport(id: number, dto: HandleReportDto, userId: number) {

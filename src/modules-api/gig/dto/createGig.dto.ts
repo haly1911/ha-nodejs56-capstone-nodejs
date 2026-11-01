@@ -1,17 +1,12 @@
-import { Transform, Type } from 'class-transformer';
-import {
-  IsInt,
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, IsString, MaxLength, Min } from 'class-validator';
+import { Trim } from '../../../common/decorators/trim.decorator';
 
 export class CreateGigDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Trim()
   title: string;
 
   @Type(() => Number)
