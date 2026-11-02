@@ -25,8 +25,12 @@ import { UpdateUserStatusDto } from './dto/updateUserStatus.dto';
 import { UpdateUserRoleDto } from './dto/updateUserRole.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MAX_FILE_SIZE } from '../../common/constant/app.constant';
+import {
+  MAX_FILE_SIZE,
+  RATE_LIMIT_TTL,
+} from '../../common/constant/app.constant';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('User')
 @Controller('user')
@@ -52,6 +56,7 @@ export class UserController {
   }
 
   @Post('avatar')
+  @Throttle({ default: { limit: 10, ttl: RATE_LIMIT_TTL } })
   @HttpCode(200)
   @ResponseMessage('Upload avatar successfully')
   @UseInterceptors(

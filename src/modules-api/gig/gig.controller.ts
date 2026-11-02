@@ -24,8 +24,9 @@ import { UpdateGigDto } from './dto/updateGig.dto';
 import { Role } from '../../common/decorators/role.decorator';
 import { UpdateModerationDto } from '../../common/dto/updateModeration.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MAX_FILE_SIZE } from '../../common/constant/app.constant';
+import { MAX_FILE_SIZE, RATE_LIMIT_TTL } from '../../common/constant/app.constant';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Gig')
 @Controller('gig')
@@ -75,6 +76,7 @@ export class GigController {
   }
 
   @Post(':id/image')
+  @Throttle({ default: { limit: 10, ttl: RATE_LIMIT_TTL } })
   @HttpCode(200)
   @ResponseMessage('Upload gig image successfully')
   @UseInterceptors(

@@ -19,9 +19,15 @@ import { OrderModule } from './modules-api/order/order.module';
 import { ReviewModule } from './modules-api/review/review.module';
 import { ReportModule } from './modules-api/report/report.module';
 import { CloudinaryModule } from './modules-system/cloudinary/cloudinary.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { RATE_LIMIT_MAX, RATE_LIMIT_TTL } from './common/constant/app.constant';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: RATE_LIMIT_TTL, limit: RATE_LIMIT_MAX }],
+      errorMessage: 'Too many requests, please try again later',
+    }),
     PrismaModule,
     AuthModule,
     TokenModule,
@@ -38,6 +44,7 @@ import { CloudinaryModule } from './modules-system/cloudinary/cloudinary.module'
   controllers: [AppController],
   providers: [
     AppService,
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: ProtectGuard },
     { provide: APP_GUARD, useClass: RoleGuard },
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },

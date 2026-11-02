@@ -20,6 +20,7 @@ Backend cho một marketplace dịch vụ freelance theo mô hình Fiverr: ngư�
 - **Review:** chỉ người mua của đơn đã hoàn thành; điểm trung bình của gig tự tính lại.
 - **Report và kiểm duyệt:** người dùng báo cáo gig, review, user; admin xử lý và ẩn nội dung hoặc khóa tài khoản.
 - **Người dùng:** hồ sơ, đổi mật khẩu, avatar, quản lý user dành cho admin.
+- **Giới hạn tần suất request:** 100 mỗi phút cho toàn API, 10 mỗi phút cho đăng nhập, đăng ký và upload ảnh.
 
 ## Chạy bằng Docker (khuyên dùng)
 
@@ -81,7 +82,7 @@ Mật khẩu chung: `123456`
 ## Tài liệu API
 
 - Swagger tại `/docs`. Để thử các route cần đăng nhập, gọi `POST /api/auth/signin` ngay trong trang Swagger; trình duyệt tự lưu cookie cho các request sau.
-- Bản Postman collection nằm trong thư mục `docs/`.
+- Bản Postman collection nằm trong thư mục `docs/postman/`.
 
 ## Cấu trúc thư mục
 
@@ -94,4 +95,4 @@ src/
 
 ## Hướng phát triển
 
-Chat 1-1 bằng WebSocket, giới hạn tần suất request (rate limit), Redis cho cache và token blacklist.
+Chat 1-1 bằng WebSocket, Redis cho cache và token blacklist.

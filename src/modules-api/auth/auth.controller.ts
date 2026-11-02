@@ -19,8 +19,13 @@ import {
   setAuthCookies,
 } from '../../common/helpers/cookie.helper';
 import { GoogleAuthGuard } from '../../common/guard/googleAuth.guard';
-import { FRONTEND_URL } from '../../common/constant/app.constant';
+import {
+  AUTH_RATE_LIMIT_MAX,
+  FRONTEND_URL,
+  RATE_LIMIT_TTL,
+} from '../../common/constant/app.constant';
 import { ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -28,6 +33,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('signup')
+  @Throttle({ default: { limit: AUTH_RATE_LIMIT_MAX, ttl: RATE_LIMIT_TTL } })
   @ResponseMessage('Sign up successfully')
   @Public()
   async signUp(
@@ -39,6 +45,7 @@ export class AuthController {
   }
 
   @Post('signin')
+  @Throttle({ default: { limit: AUTH_RATE_LIMIT_MAX, ttl: RATE_LIMIT_TTL } })
   @HttpCode(200)
   @ResponseMessage('Sign in successfully')
   @Public()
