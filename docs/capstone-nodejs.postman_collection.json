@@ -1,0 +1,1296 @@
+{
+  "info": {
+    "_postman_id": "d3a64ada-cee7-43a9-8912-6c831dff7f2c",
+    "name": "Fiverr API - Capstone NodeJS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Sign up",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\" : \"newuser.test@gmail.com\",\r\n    \"password\" : \"123456\",\r\n    \"name\": \"User Test\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/auth/signup",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign in",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\" : \"admin.test@gmail.com\",\r\n    \"password\" : \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/auth/signin",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "auth",
+                "signin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/auth/get-info",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "auth",
+                "get-info"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/auth/refresh-token",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign out",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/auth/signout",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "auth",
+                "signout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "item": [
+        {
+          "name": "List categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/category?page=1&pageSize=2",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "category"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Category by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/category/1",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "category",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create category",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Test category api\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/category",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "category"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update category",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Graphics & Design\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/category/1",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "category",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/category/6",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "category",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Gig",
+      "item": [
+        {
+          "name": "List gigs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/gig?minPrice=1000000&maxPrice=2000000",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "gig"
+              ],
+              "query": [
+                {
+                  "key": "minPrice",
+                  "value": "1000000"
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "2000000"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gig by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/gig/7",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "gig",
+                "7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My gigs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/gig/my-gigs",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "gig",
+                "my-gigs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create gig",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Test Gig\",\r\n    \"price\": 100000,\r\n    \"description\": \"Test Gig\",\r\n    \"short_description\": \"Test Gig\",\r\n    \"subcategory_id\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/gig",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "gig"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update gig",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Test Gig\",\r\n    \"price\": 100000,\r\n    \"description\": \"Test Gig\",\r\n    \"short_description\": \"Test Gig\",\r\n    \"subcategory_id\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/gig/6",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "gig",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete gig",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/gig/11",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "gig",
+                "11"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update moderation status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"moderation_status\": \"Active\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/gig/1/moderation",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "gig",
+                "1",
+                "moderation"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload gig image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{domain}}/gig/1/image",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "gig",
+                "1",
+                "image"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "item": [
+        {
+          "name": "Create order",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"gig_id\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/order",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "order"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/order/my-orders?status=Pending",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "order",
+                "my-orders"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Pending"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My sales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/order/my-sales",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "order",
+                "my-sales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Order by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/order/7",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "order",
+                "7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List order",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/order",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "order"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update order status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"InProgress\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/order/13/status",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "order",
+                "13",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Report",
+      "item": [
+        {
+          "name": "Create report",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"target_type\": \"gig\",\r\n    \"target_id\": 6,\r\n    \"reason\": \"Scam\",\r\n    \"description\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/report",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "report"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My reports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/report/my-reports",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "report",
+                "my-reports"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List reports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/report?status=Pending",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "report"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Pending"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Handle report",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"Rejected\",\r\n    \"resolution_note\": \"Resolved\",\r\n    \"action\": null\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/report/5/status",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "report",
+                "5",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Review",
+      "item": [
+        {
+          "name": "Create review",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"order_id\": 6,\r\n    \"rating\": 5,\r\n    \"content\": \"Great service\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/review",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "review"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List reviews by gig",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/review?gig_id=6",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "review"
+              ],
+              "query": [
+                {
+                  "key": "gig_id",
+                  "value": "6"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/review/my-reviews",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "review",
+                "my-reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update review",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"rating\": 5,\r\n    \"content\": \"Great service\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/review/7",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "review",
+                "7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete review",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/review/1",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "review",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update moderation status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"moderation_status\": \"Active\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/review/999/moderation",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "review",
+                "999",
+                "moderation"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Subcategory",
+      "item": [
+        {
+          "name": "List subcategories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/subcategory?page=1&pageSize=3",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "subcategory"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "3"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Subcategory by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/subcategory/999",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "subcategory",
+                "999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create subcategory",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Test subcategory\",\r\n    \"subcategory_group_id\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/subcategory",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "subcategory"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update subcategory",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Test subcategory\",\r\n    \"subcategory_group_id\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/subcategory/21",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "subcategory",
+                "21"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete subcategory",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/subcategory/21",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "subcategory",
+                "21"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Subcategory group",
+      "item": [
+        {
+          "name": "List subcategory groups",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/subcategory-group?page=1&pageSize=3",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "subcategory-group"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "3"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Subcategory group by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/subcategory-group/2",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "subcategory-group",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create subcategory group",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Test subcategory group\",\r\n    \"category_id\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/subcategory-group",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "subcategory-group"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update subcategory group",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Test subcategory group\",\r\n    \"category_id\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/subcategory-group/13",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "subcategory-group",
+                "13"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete subcategory group",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/subcategory-group/13",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "subcategory-group",
+                "13"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/user?keyword=admin",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "user"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "admin"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/user/4",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "user",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update profile",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Admin Test\",\r\n    \"phone\": null,\r\n    \"birthday\": null,\r\n    \"gender\": null,\r\n    \"skill\": null,\r\n    \"certification\": null\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/user/profile",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "user",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change password",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"oldPassword\": \"123456\",\r\n    \"newPassword\": \"Abc@123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/user/password",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "user",
+                "password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update user status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"account_status\": \"Active\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/user/3/status",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "user",
+                "3",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update user role",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"role\": \"User\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/user/5/role",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "user",
+                "5",
+                "role"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{domain}}/user/5",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "user",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create user",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"testuser@gmail.com\",\r\n    \"password\": \"Abc@123\",\r\n    \"name\": \"Test User\",\r\n    \"role\": \"User\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}/user",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload avatar",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{domain}}/user/avatar",
+              "host": [
+                "{{domain}}"
+              ],
+              "path": [
+                "user",
+                "avatar"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "domain",
+      "value": "localhost:3069/api"
+    }
+  ]
+}

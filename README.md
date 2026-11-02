@@ -1,98 +1,97 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Fiverr API (Capstone NodeJS)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend cho một marketplace dịch vụ freelance theo mô hình Fiverr: người bán đăng gig, người mua đặt đơn và đánh giá, admin kiểm duyệt nội dung.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Công nghệ
 
-## Description
+- NestJS 11, TypeScript
+- Prisma 7 (adapter MariaDB) với MySQL
+- JWT lưu trong cookie httpOnly, đăng nhập Google (Passport)
+- Cloudinary (upload ảnh), Swagger (tài liệu API)
+- Docker, Docker Compose
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Chức năng
 
-## Project setup
+- **Auth:** đăng ký, đăng nhập, đăng xuất, làm mới token, đăng nhập Google.
+- **Phân quyền:** ba vai trò `SuperAdmin`, `Admin`, `User`.
+- **Danh mục:** category, subcategory group, subcategory (CRUD, xóa mềm).
+- **Gig:** danh sách công khai có tìm kiếm, lọc, sắp xếp, phân trang; người bán tạo, sửa, xóa gig và upload ảnh.
+- **Đơn hàng:** tạo đơn, đơn mua và đơn bán của tôi, đổi trạng thái theo vai trò (`Pending`, `InProgress`, `Completed`, `Cancelled`).
+- **Review:** chỉ người mua của đơn đã hoàn thành; điểm trung bình của gig tự tính lại.
+- **Report và kiểm duyệt:** người dùng báo cáo gig, review, user; admin xử lý và ẩn nội dung hoặc khóa tài khoản.
+- **Người dùng:** hồ sơ, đổi mật khẩu, avatar, quản lý user dành cho admin.
+
+## Chạy bằng Docker (khuyên dùng)
+
+Yêu cầu: Docker Desktop.
 
 ```bash
-$ npm install
+cp .env.example .env
+docker compose up --build
 ```
 
-## Compile and run the project
+(Trên Windows dùng `copy .env.example .env`.)
 
-```bash
-# development
-$ npm run start
+- Swagger: http://localhost:3069/docs
+- Các API nằm dưới tiền tố `/api`, ví dụ `GET http://localhost:3069/api/gig`.
+- MySQL trong Docker công khai ở cổng `3307` của máy (user `root`, mật khẩu là `DB_ROOT_PASSWORD`).
+- Lần chạy đầu, MySQL tự nạp file `capstone_nodejs.sql` (cấu trúc bảng và dữ liệu mẫu). Muốn nạp lại từ đầu: `docker compose down -v` rồi chạy lại.
 
-# watch mode
-$ npm run start:dev
+## Chạy không dùng Docker
 
-# production mode
-$ npm run start:prod
+Yêu cầu: Node.js, MySQL 8 trở lên.
+
+1. Tạo database `capstone_nodejs` rồi import file `capstone_nodejs.sql`.
+2. `cp .env.example .env` và sửa `DATABASE_URL` cho đúng MySQL của bạn.
+3. Cài thư viện và sinh Prisma client (thư mục client không nằm trong repo):
+
+   ```bash
+   npm install
+   npx prisma generate
+   ```
+
+4. `npm run start:dev`
+
+## Biến môi trường
+
+| Biến                                                              | Ý nghĩa                                                   |
+| ----------------------------------------------------------------- | --------------------------------------------------------- |
+| `PORT`                                                            | Cổng của ứng dụng                                         |
+| `NODE_ENV`                                                        | `development` hoặc `production`                           |
+| `DATABASE_URL`                                                    | Chuỗi kết nối MySQL khi chạy app trực tiếp                |
+| `DB_ROOT_PASSWORD`                                                | Mật khẩu root MySQL cho docker compose                    |
+| `ACCESS_TOKEN_SECRET_KEY`, `REFRESH_TOKEN_SECRET_KEY`             | Khóa bí mật ký JWT                                        |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL` | Cấu hình OAuth Google                                     |
+| `FRONTEND_URL`                                                    | Địa chỉ frontend để chuyển hướng sau khi đăng nhập Google |
+| `CLOUDINARY_URL`                                                  | Chuỗi kết nối Cloudinary                                  |
+
+Các giá trị trong `.env.example` là giá trị mẫu để ứng dụng khởi động. Muốn thử đăng nhập Google và upload ảnh thì cần khóa thật của riêng bạn.
+
+## Tài khoản demo
+
+Mật khẩu chung: `123456`
+
+| Email                 | Vai trò                            |
+| --------------------- | ---------------------------------- |
+| sa.test@gmail.com     | SuperAdmin                         | đổi vai trò (Update user role), khóa hoặc xóa tài khoản Admin                                 |
+| admin.test@gmail.com  | Admin                              | tạo, sửa, xóa danh mục, danh sách order và report, xử lý report, đổi moderation, quản lý user |
+| user.test@gmail.com   | User (người bán gig 1 đến 5 và 9)  | tạo gig, đặt đơn, review, tạo report, my-gigs, my-orders                                      |
+| seller.demo@gmail.com | User (người bán gig 6 đến 8 và 10) |
+
+## Tài liệu API
+
+- Swagger tại `/docs`. Để thử các route cần đăng nhập, gọi `POST /api/auth/signin` ngay trong trang Swagger; trình duyệt tự lưu cookie cho các request sau.
+- Bản Postman collection nằm trong thư mục `docs/`.
+
+## Cấu trúc thư mục
+
+```
+src/
+├── common/          decorator, guard, interceptor, filter, helper dùng chung
+├── modules-api/     auth, user, category, subcategory-group, subcategory, gig, order, review, report
+└── modules-system/  prisma, token, cloudinary
 ```
 
-## Run tests
+## Hướng phát triển
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Chat 1-1 bằng WebSocket, giới hạn tần suất request (rate limit), Redis cho cache và token blacklist.

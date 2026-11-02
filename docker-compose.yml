@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mysql:9.7
+    container_name: capstone-nodejs-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: capstone_nodejs
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./capstone_nodejs.sql:/docker-entrypoint-initdb.d/capstone_nodejs.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: capstone-nodejs-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: mysql://root:${DB_ROOT_PASSWORD}@db:3306/capstone_nodejs
+    ports:
+      - "3069:3069"
+    depends_on:
+      db:
+        condition: service_healthy
